@@ -1,10 +1,13 @@
-#include <TH/TH.h>
+//#include <TH/TH.h>
+#include "cpu/th_radon.h"
+
 #define MAXX(x,y) ((x) > (y) ? (x) : (y))  
 
-void incrementRadon(float *pr, float pixel, float r)   
+template <typename T>
+void incrementRadon(T *pr, T pixel, T r)   
 {   
     int r1;   
-    float delta;   
+    T delta;   
    
     r1 = (int) r;   
     delta = r - r1;   
@@ -12,24 +15,24 @@ void incrementRadon(float *pr, float pixel, float r)
     pr[r1+1] += pixel * delta;   
 }   
 
-static void    
-radonckernel(float *pPtr, float *iPtr, float *thetaPtr, int M, int N,    
-      int xOrigin, int yOrigin, int numAngles, int rFirst, int rSize)   
+template <typename T>
+void radonckernel(T *pPtr, const T *iPtr, const T *thetaPtr, const int M, const int N,    
+      const int xOrigin, const int yOrigin, const int numAngles, const int rFirst, const int rSize)   
 {   
     int k, m, n;              /* loop counters */   
-    float angle;             /* radian angle value */   
-    float cosine, sine;      /* cosine and sine of current angle */   
-    float *pr;               /* points inside output array */   
-    float *pixelPtr;         /* points inside input array */   
-    float pixel;             /* current pixel value */   
-    float *ySinTable, *xCosTable;   
+    T angle;             /* radian angle value */   
+    T cosine, sine;      /* cosine and sine of current angle */   
+    T *pr;               /* points inside output array */   
+    const T *pixelPtr;         /* points inside input array */   
+    T pixel;             /* current pixel value */   
+    T *ySinTable, *xCosTable;   
     /* tables for x*cos(angle) and y*sin(angle) */   
-    float x,y;   
-    float r;    
+    T x,y;   
+    T r;    
    
     /* Allocate space for the lookup tables */   
-    xCosTable = new float[2*N];
-    ySinTable = new float[2*M]; 
+    xCosTable = new T[2*N];
+    ySinTable = new T[2*M]; 
    
     for (k = 0; k < numAngles; k++) {   
         angle = thetaPtr[k];   
@@ -84,7 +87,7 @@ radonckernel(float *pPtr, float *iPtr, float *thetaPtr, int M, int N,
     delete [] ySinTable;             
 }  
 
-void radonc(float* Img, float* theta, int M, int N, int m, int n, float* P, float* R)
+void radonc(float* Img, float* theta, int M, int N, int m, int n, float* P)
 {
     int numAngles;          /* number of theta values */   
     float *thetaPtr;       /* pointer to theta values in radians */   
@@ -113,15 +116,12 @@ void radonc(float* Img, float* theta, int M, int N, int m, int n, float* P, floa
     rFirst = -rLast;   
     rSize = rLast - rFirst + 1;      
 
-    for (k = rFirst; k <= rLast; k++)
-        *(R++) = (float) k;
-
     /* Invoke main computation routines */   
     radonckernel(P, Img, thetaPtr, M, N, xOrigin, yOrigin, numAngles, rFirst, rSize);
 
 }
-
-int cpu_radon(THFloatTensor * P, THFloatTensor * R, THFloatTensor * img, THFloatTensor * theta)
+/*
+int cpu_radon(THFloatTensor * P, THFloatTensor * img, THFloatTensor * theta)
 {
     // Image size
     int M = THFloatTensor_size(img, 0);
@@ -130,9 +130,55 @@ int cpu_radon(THFloatTensor * P, THFloatTensor * R, THFloatTensor * img, THFloat
     int n = THFloatTensor_size(theta, 1);
 
     float * P_flat = THFloatTensor_data(P);
-    float * R_flat = THFloatTensor_data(R);
     float * img_flat = THFloatTensor_data(img);
     float * theta_flat = THFloatTensor_data(theta);
 
-    radonc(img_flat, theta_flat, M, N, m, n, P_flat, R_flat);
+    radonc(img_flat, theta_flat, M, N, m, n, P_flat);
+}
+*/
+
+at::Tensor radon_cpu(const at::Tensor& input,
+                    const at::Tensor& theta) {
+    AT_ASSERTM(!input.type().is_cuda(), "input must be a CPU tensor");
+    AT_ASSERTM(!theta.type().is_cuda(), "input must be a CPU tensor");
+
+    auto M = input.size(0);
+    auto N = input.size(1);
+
+    auto m = theta.size(0);
+    auto n = theta.size(1);
+
+    auto xOrigin = MAXX(0, (N-1)/2);   
+    auto yOrigin = MAXX(0, (M-1)/2);      
+    auto temp1 = M - 1 - yOrigin;   
+    auto temp2 = N - 1 - xOrigin;  
+    auto rLast = std::ceil(std::sqrt((float) (temp1*temp1+temp2*temp2))) + 1;
+    auto rFirst = -rLast;
+    auto rSize = rLast - rFirst + 1;   
+    auto numAngles = m * n;
+
+    auto radon_img = at::empty({rSize, numAngles}, input.options());
+    auto radon_img_size = M * N;
+
+
+    if (radon_img.numel() == 0) {
+        return radon_img;
+    }
+
+    AT_DISPATCH_FLOATING_TYPES(input.type(), "radon", [&] {
+/*        radonc(input.data(), 
+            theta.data(),
+            M,
+            N,
+            m,
+            n,
+            radon_img.data());
+*/       radonckernel<scalar_t>(
+        radon_img.data<scalar_t>(),
+        input.data<scalar_t>(),
+        theta.data<scalar_t>(),
+        M, N, xOrigin, yOrigin, numAngles, rFirst, rSize
+        );
+    });
+    return radon_img;
 }
