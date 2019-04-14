@@ -1,62 +1,6 @@
 #include <TH/TH.h>
 #define MAXX(x,y) ((x) > (y) ? (x) : (y))  
 
-int cpu_radon(THFloatTensor * P, THFloatTensor * R, THFloatTensor * img, THFloatTensor * theta)
-{
-	// Image size
-	int M = THFloatTensor_size(img, 0);
-	int N = THFloatTensor_size(img, 1);
-	int m = THFloatTensor_size(theta, 0);
-	int n = THFloatTensor_size(theta, 1);
-
-	float * P_flat = THFloatTensor_data(P);
-	float * R_flat = THFloatTensor_data(R);
-	float * img_flat = THFloatTensor_data(img);
-	float * theta_flat = THFloatTensor_data(theta);
-
-	radonc(img_flat, theta_flat, M, N, m, n, P_flat, R_flat);
-}
-
-void radonc(float* Img, float* theta, int M, int N, int m, int n, float* P, float* R)
-{
-    int numAngles;          /* number of theta values */   
-    float *thetaPtr;       /* pointer to theta values in radians */   
-    float *pr1, *pr2;      /* float pointers used in loop */   
-    float deg2rad;         /* conversion factor */   
-    float temp;            /* temporary theta-value holder */   
-    int k;                  /* loop counter */    
-    int xOrigin, yOrigin;   /* center of image */   
-    int temp1, temp2;       /* used in output size computation */   
-    int rFirst, rLast;      /* r-values for first and last row of output */   
-    int rSize;              /* number of rows in output */  
-
-    /* Get THETA values */   
-    deg2rad = 3.14159265358979 / 180.0;  
-    numAngles = m * n;
-    thetaPtr = new float[numAngles];
-    for (k = 0; k < numAngles; k++)
-        *(thetaPtr++) = *(theta++) * deg2rad;
-
-    /* Where is the coordinate system's origin? */   
-    xOrigin = MAXX(0, (N-1)/2);   
-    yOrigin = MAXX(0, (M-1)/2);   
-    /* How big will the output be? */   
-    temp1 = M - 1 - yOrigin;   
-    temp2 = N - 1 - xOrigin;   
-    rLast = (int) ceil(sqrt((float) (temp1*temp1+temp2*temp2))) + 1;   
-    rFirst = -rLast;   
-    rSize = rLast - rFirst + 1;      
-
-    R = new float[rSize];
-    for (k = rFirst; k <= rLast; k++)
-    	*(R++) = (float) k;
-
-    /* Invoke main computation routines */   
-    P = new float[rSize*numAngles];
-    radonckernel(P, I, thetaPtr, M, N, xOrigin, yOrigin, numAngles, rFirst, rSize);
-
-}
-
 void incrementRadon(float *pr, float pixel, float r)   
 {   
     int r1;   
@@ -140,3 +84,57 @@ radonckernel(float *pPtr, float *iPtr, float *thetaPtr, int M, int N,
     delete [] xCosTable;
     delete [] ySinTable;             
 }  
+
+void radonc(float* Img, float* theta, int M, int N, int m, int n, float* P, float* R)
+{
+    int numAngles;          /* number of theta values */   
+    float *thetaPtr;       /* pointer to theta values in radians */   
+    float *pr1, *pr2;      /* float pointers used in loop */   
+    float deg2rad;         /* conversion factor */   
+    float temp;            /* temporary theta-value holder */   
+    int k;                  /* loop counter */    
+    int xOrigin, yOrigin;   /* center of image */   
+    int temp1, temp2;       /* used in output size computation */   
+    int rFirst, rLast;      /* r-values for first and last row of output */   
+    int rSize;              /* number of rows in output */  
+
+    /* Get THETA values */   
+    deg2rad = 3.14159265358979 / 180.0;  
+    numAngles = m * n;
+    thetaPtr = new float[numAngles];
+    for (k = 0; k < numAngles; k++)
+        *(thetaPtr++) = *(theta++) * deg2rad;
+
+    /* Where is the coordinate system's origin? */   
+    xOrigin = MAXX(0, (N-1)/2);   
+    yOrigin = MAXX(0, (M-1)/2);   
+    /* How big will the output be? */   
+    temp1 = M - 1 - yOrigin;   
+    temp2 = N - 1 - xOrigin;   
+    rLast = (int) ceil(sqrt((float) (temp1*temp1+temp2*temp2))) + 1;   
+    rFirst = -rLast;   
+    rSize = rLast - rFirst + 1;      
+
+    for (k = rFirst; k <= rLast; k++)
+        *(R++) = (float) k;
+
+    /* Invoke main computation routines */   
+    radonckernel(P, Img, thetaPtr, M, N, xOrigin, yOrigin, numAngles, rFirst, rSize);
+
+}
+
+int cpu_radon(THFloatTensor * P, THFloatTensor * R, THFloatTensor * img, THFloatTensor * theta)
+{
+    // Image size
+    int M = THFloatTensor_size(img, 0);
+    int N = THFloatTensor_size(img, 1);
+    int m = THFloatTensor_size(theta, 0);
+    int n = THFloatTensor_size(theta, 1);
+
+    float * P_flat = THFloatTensor_data(P);
+    float * R_flat = THFloatTensor_data(R);
+    float * img_flat = THFloatTensor_data(img);
+    float * theta_flat = THFloatTensor_data(theta);
+
+    radonc(img_flat, theta_flat, M, N, m, n, P_flat, R_flat);
+}
