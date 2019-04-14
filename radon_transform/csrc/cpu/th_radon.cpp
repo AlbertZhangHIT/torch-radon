@@ -92,7 +92,6 @@ void radonc(float* Img, float* theta, int M, int N, int m, int n, float* P)
     int numAngles;          /* number of theta values */   
     float *thetaPtr;       /* pointer to theta values in radians */   
     float deg2rad;         /* conversion factor */   
-    float temp;            /* temporary theta-value holder */   
     int k;                  /* loop counter */    
     int xOrigin, yOrigin;   /* center of image */   
     int temp1, temp2;       /* used in output size computation */   
@@ -120,22 +119,6 @@ void radonc(float* Img, float* theta, int M, int N, int m, int n, float* P)
     radonckernel(P, Img, thetaPtr, M, N, xOrigin, yOrigin, numAngles, rFirst, rSize);
 
 }
-/*
-int cpu_radon(THFloatTensor * P, THFloatTensor * img, THFloatTensor * theta)
-{
-    // Image size
-    int M = THFloatTensor_size(img, 0);
-    int N = THFloatTensor_size(img, 1);
-    int m = THFloatTensor_size(theta, 0);
-    int n = THFloatTensor_size(theta, 1);
-
-    float * P_flat = THFloatTensor_data(P);
-    float * img_flat = THFloatTensor_data(img);
-    float * theta_flat = THFloatTensor_data(theta);
-
-    radonc(img_flat, theta_flat, M, N, m, n, P_flat);
-}
-*/
 
 at::Tensor radon_cpu(const at::Tensor& input,
                     const at::Tensor& theta) {
@@ -158,22 +141,13 @@ at::Tensor radon_cpu(const at::Tensor& input,
     auto numAngles = m * n;
 
     auto radon_img = at::empty({rSize, numAngles}, input.options());
-    auto radon_img_size = M * N;
-
 
     if (radon_img.numel() == 0) {
         return radon_img;
     }
 
     AT_DISPATCH_FLOATING_TYPES(input.type(), "radon", [&] {
-/*        radonc(input.data(), 
-            theta.data(),
-            M,
-            N,
-            m,
-            n,
-            radon_img.data());
-*/       radonckernel<scalar_t>(
+      radonckernel<scalar_t>(
         radon_img.data<scalar_t>(),
         input.data<scalar_t>(),
         theta.data<scalar_t>(),

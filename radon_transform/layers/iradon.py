@@ -1,11 +1,7 @@
-from radon_transform import _C
-
-radon = _C.radon
-# radon.__doc__ = """
-# This function performs radon transform of 2-D tensor """
-
 import torch
 import numpy as np
+
+from radon_transform import _C
 
 def designFilter(filter_mode, length, d=1.):
 	if filter_mode not in ('ram-lak', 'shepp-logan', 'cosine', 'hamming', 'hann'):
@@ -78,3 +74,5 @@ def iradon(radon_img, theta=None, output_size=None, filt='ram-lak', interp_mode=
 	img = _C.backproject(filtered_proj, costheta, sintheta, interp_flag)
 
 	return img
+
+

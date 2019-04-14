@@ -17,3 +17,6 @@ class TestRADON(unittest.TestCase):
 
 		measure = radon(img, theta)
 		np.testing.assert_array_equal(measure.numpy(), target)
+
+if __name__ == "__main__":
+	unittest.main()

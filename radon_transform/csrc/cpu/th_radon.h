@@ -1,4 +1,3 @@
-//int cpu_radon(THFloatTensor * P, THFloatTensor * R, THFloatTensor * img, THFloatTensor * theta);
 
 #pragma once
 #include <torch/extension.h>
