@@ -25,8 +25,7 @@ radonckernel(float *pPtr, float *iPtr, float *thetaPtr, int M, int N,
     float *ySinTable, *xCosTable;   
     /* tables for x*cos(angle) and y*sin(angle) */   
     float x,y;   
-    float r, delta;   
-    int r1;   
+    float r;    
    
     /* Allocate space for the lookup tables */   
     xCosTable = new float[2*N];
@@ -89,7 +88,6 @@ void radonc(float* Img, float* theta, int M, int N, int m, int n, float* P, floa
 {
     int numAngles;          /* number of theta values */   
     float *thetaPtr;       /* pointer to theta values in radians */   
-    float *pr1, *pr2;      /* float pointers used in loop */   
     float deg2rad;         /* conversion factor */   
     float temp;            /* temporary theta-value holder */   
     int k;                  /* loop counter */    

@@ -14,7 +14,7 @@ this_file = os.path.dirname(os.path.realpath(__file__))
 print(this_file)
 
 ffi = create_extension(
-	'_ext.radon',
+	'_ext.th_radon',
 	headers=headers,
 	sources=sources,
 	define_macros=defines,
