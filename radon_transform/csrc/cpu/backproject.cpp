@@ -2,12 +2,13 @@
 
 template <typename T>
 void backproject_cpu_kernel(T *img, const T *radon_img, 
-							const T *costheta, const T *sintheta, 
+							const T *theta,
 							const int measure_len, const int num_proj,
 							const int output_size, const int interp_flag) {
 
 	T cos_theta, sin_theta, t;
 	const T *proj;
+	T * imgPtr;
 	int tmp;
 
 	T ctr = std::floor((output_size-1) / 2);
@@ -19,10 +20,10 @@ void backproject_cpu_kernel(T *img, const T *radon_img,
 
 	for (int theta_idx = 0; theta_idx < num_proj; theta_idx++)
 	{
-		cos_theta = costheta[theta_idx];
-		sin_theta = sintheta[theta_idx];
+		cos_theta = std::cos(theta[theta_idx]);
+		sin_theta = std::sin(theta[theta_idx]);
 		proj = (radon_img + theta_idx*measure_len);
-
+		imgPtr = img;
 		switch (interp_flag)
 		{
 		case 0: /* nearest-neighbour interpolation */
@@ -32,7 +33,7 @@ void backproject_cpu_kernel(T *img, const T *radon_img,
 				for (int y_idx = 0; y_idx < output_size; y_idx++)
 				{
 					tmp = std::round(t);
-					*img++ += proj[tmp + ctr_idx];
+					*imgPtr++ += proj[tmp + ctr_idx];
 					t -= sin_theta;
 				} /* end of y-loop*/
 			} /* end of x-loop*/
@@ -45,7 +46,7 @@ void backproject_cpu_kernel(T *img, const T *radon_img,
 				for (int y_idx = 0; y_idx < output_size; y_idx++)
 				{
 					tmp = std::floor(t);
-					*img++ += (t-tmp) * (proj[tmp + ctr_idx_1] - proj[tmp + ctr_idx]) + proj[tmp + ctr_idx];
+					*imgPtr++ += (t-tmp) * (proj[tmp + ctr_idx_1] - proj[tmp + ctr_idx]) + proj[tmp + ctr_idx];
 					t -= sin_theta;
 				} /* end of y-loop*/
 			} /* end of x-loop*/
@@ -56,25 +57,23 @@ void backproject_cpu_kernel(T *img, const T *radon_img,
 }
 
 at::Tensor backproject_cpu(const at::Tensor& radon_img, 
-						const at::Tensor& costheta,
-						const at::Tensor& sintheta, 
+						const at::Tensor& theta,
 						const int output_size,
 						const int interp_flag) {
 	AT_ASSERTM(!radon_img.type().is_cuda(), "radon measure must be a CPU tensor");
-	AT_ASSERTM(!costheta.type().is_cuda(), "costheta must be a CPU tensor");
-	AT_ASSERTM(!sintheta.type().is_cuda(), "sintheta must be a CPU tensor");
+	AT_ASSERTM(!theta.type().is_cuda(), "theta must be a CPU tensor");
+
 
 	auto measure_len = radon_img.size(0);
 	auto num_proj = radon_img.size(1);
 
-	auto fbp_img = at::empty({output_size, output_size}, radon_img.options());
+	auto fbp_img = at::zeros({output_size, output_size}, radon_img.options());
 
 	AT_DISPATCH_FLOATING_TYPES(radon_img.type(), 'backproject', [&] {
 		backproject_cpu_kernel<scalar_t>(
 			fbp_img.data<scalar_t>(),
 			radon_img.data<scalar_t>(), 
-			costheta.data<scalar_t>(),
-			sintheta.data<scalar_t>(),
+			theta.data<scalar_t>(),
 			measure_len, num_proj,
 			output_size, interp_flag);
 	});

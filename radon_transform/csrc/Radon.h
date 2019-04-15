@@ -1,6 +1,7 @@
 #pragma once
-#include "cpu/th_radon.h"
-#include "cpu/backproject.h"
+#include "cpu/radon_cpu.h"
+//#include "cpu/th_radon.h"
+#include "cpu/backproject_cpu.h"
 
 at::Tensor radon(const at::Tensor& input,
                  const at::Tensor& theta) {
@@ -8,13 +9,11 @@ at::Tensor radon(const at::Tensor& input,
 }
 
 at::Tensor backproject(const at::Tensor& radon_img, 
-						const at::Tensor& costheta,
-						const at::Tensor& sintheta, 
+						const at::Tensor& theta,
 						const int output_size,
 						const int interp_flag) {
 	return backproject_cpu(radon_img, 
-						costheta,
-						sintheta, 
+						theta,
 						output_size,
 						interp_flag);
 }

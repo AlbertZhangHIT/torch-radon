@@ -1,4 +1,4 @@
-//#include <TH/TH.h>
+
 #include "cpu/th_radon.h"
 
 #define MAXX(x,y) ((x) > (y) ? (x) : (y))  
@@ -16,13 +16,12 @@ void incrementRadon(T *pr, T pixel, T r)
 }   
 
 template <typename T>
-void radonckernel(T *pPtr, const T *iPtr, const T *thetaPtr, const int M, const int N,    
+void radonckernel(const T *pPtr, const T *iPtr, const T *thetaPtr, const int M, const int N,    
       const int xOrigin, const int yOrigin, const int numAngles, const int rFirst, const int rSize)   
 {   
     int k, m, n;              /* loop counters */   
     T angle;             /* radian angle value */   
     T cosine, sine;      /* cosine and sine of current angle */   
-    T *pr;               /* points inside output array */   
     const T *pixelPtr;         /* points inside input array */   
     T pixel;             /* current pixel value */   
     T *ySinTable, *xCosTable;   
@@ -36,7 +35,7 @@ void radonckernel(T *pPtr, const T *iPtr, const T *thetaPtr, const int M, const 
    
     for (k = 0; k < numAngles; k++) {   
         angle = thetaPtr[k];   
-        pr = pPtr + k*rSize;  /* pointer to the top of the output column */   
+        const T *pr = pPtr + k*rSize;  /* pointer to the top of the output column */   
         cosine = cos(angle);    
         sine = sin(angle);      
    
@@ -128,9 +127,6 @@ at::Tensor radon_cpu(const at::Tensor& input,
     auto M = input.size(0);
     auto N = input.size(1);
 
-    auto m = theta.size(0);
-    auto n = theta.size(1);
-
     auto xOrigin = MAXX(0, (N-1)/2);   
     auto yOrigin = MAXX(0, (M-1)/2);      
     auto temp1 = M - 1 - yOrigin;   
@@ -138,9 +134,9 @@ at::Tensor radon_cpu(const at::Tensor& input,
     auto rLast = std::ceil(std::sqrt((float) (temp1*temp1+temp2*temp2))) + 1;
     auto rFirst = -rLast;
     auto rSize = rLast - rFirst + 1;   
-    auto numAngles = m * n;
+    auto numAngles = theta.numel();
 
-    auto radon_img = at::empty({rSize, numAngles}, input.options());
+    auto radon_img = at::zeros({rSize, numAngles}, input.options());
 
     if (radon_img.numel() == 0) {
         return radon_img;

@@ -3,10 +3,10 @@ import unittest
 import torch
 import numpy as np
 import scipy.io as sio
-from radon_transform.layers import radon, iradon
+from radon_transform.layers import np_iradon
 
-class TestIRADON(unittest.TestCase):
-	def test_iradon_cpu(self):
+class TestNPIRADON(unittest.TestCase):
+	def test_npiradon_cpu(self):
 		radon_img = sio.loadmat('rdQ.mat')['rdQ']
 #		theta = sio.loadmat('theta.mat')['theta']
 		theta = np.linspace(0., 180., 50, endpoint=False)
@@ -15,8 +15,8 @@ class TestIRADON(unittest.TestCase):
 		radon_img = torch.from_numpy(radon_img).float()
 		theta = torch.from_numpy(theta).float()
 
-		recon_fbp = iradon(radon_img, theta, output_size=512)
-		sio.savemat('torch_iradon.mat', dict(fbp_img=recon_fbp.numpy()))
+		recon_fbp = np_iradon(radon_img, theta, output_size=512)
+		sio.savemat('torch_np_iradon.mat', dict(fbp_img=recon_fbp.numpy()))
 
 		error = recon_fbp - torch.from_numpy(target).float()
 
