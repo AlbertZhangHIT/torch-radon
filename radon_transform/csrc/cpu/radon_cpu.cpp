@@ -49,9 +49,9 @@ at::Tensor radon_cpu_kernel(const at::Tensor& img,
 			ySinTable[2*h+1] = (y + 0.25)*sine;
 		}
 
-		for (int64_t h = 0; h < H; h++) {
-			for (int64_t w = 0; w < W; w++) {
-				auto pixel = imgPtr[w*H+h];
+		for (int64_t w = 0; w < W; w++) {
+			for (int64_t h = 0; h < H; h++) {
+				auto pixel = imgPtr[h*W+w];
 				if (pixel != 0.0) {
 					pixel *= 0.25;
 

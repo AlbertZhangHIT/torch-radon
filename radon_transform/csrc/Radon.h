@@ -1,6 +1,5 @@
 #pragma once
 #include "cpu/radon_cpu.h"
-//#include "cpu/th_radon.h"
 #include "cpu/backproject_cpu.h"
 
 at::Tensor radon(const at::Tensor& input,
