@@ -35,29 +35,29 @@ class TestRADONBIAS(unittest.TestCase):
 			% ((error_np_fbp**2).mean().sqrt(), error_np_fbp.abs().mean()))
 
 
-		fig, axarr = plt.subplots(3, 2, figsize=(8, 13.5))
+		fig, axarr = plt.subplots(2, 3, figsize=(15, 8))
 		axarr[0, 0].set_title("Original")
 		axarr[0, 0].imshow(image.numpy(), cmap=plt.cm.Greys_r)
 
-		axarr[0, 1].set_title("Radon transform\n(Sinogram)")
-		axarr[0, 1].set_xlabel("Projection angle (deg)")
-		axarr[0, 1].set_ylabel("Projection position (pixels)")
-		axarr[0, 1].imshow(sinogram.numpy(), cmap=plt.cm.Greys_r, 
+		axarr[1, 0].set_title("Radon transform\n(Sinogram)")
+		axarr[1, 0].set_xlabel("Projection angle (deg)")
+		axarr[1, 0].set_ylabel("Projection position (pixels)")
+		axarr[1, 0].imshow(sinogram.numpy(), cmap=plt.cm.Greys_r, 
 			extent=(0, 180, 0, sinogram.size(0)), aspect='auto')
 
-		axarr[1, 0].set_title("fbp iradon")
-		axarr[1, 0].imshow(fbp.numpy(), cmap=plt.cm.Greys_r)
+		axarr[0, 1].set_title("fbp[iradon]")
+		axarr[0, 1].imshow(fbp.numpy(), cmap=plt.cm.Greys_r)
 
-		axarr[1, 1].set_title("fbp iradon error")
+		axarr[1, 1].set_title("fbp[iradon] error (rms: %.3g)" % (error_fbp**2).mean().sqrt())
 		axarr[1, 1].imshow((error_fbp).numpy(), cmap=plt.cm.Greys_r)		
 
-		axarr[2, 0].set_title("fbp np_iradon")
-		axarr[2, 0].imshow(np_fbp.numpy(), cmap=plt.cm.Greys_r)
+		axarr[0, 2].set_title("fbp[np_iradon]")
+		axarr[0, 2].imshow(np_fbp.numpy(), cmap=plt.cm.Greys_r)
 
-		axarr[2, 1].set_title("fbp np_iradon error")
-		axarr[2, 1].imshow((error_np_fbp).numpy(), cmap=plt.cm.Greys_r)
+		axarr[1, 2].set_title("fbp[np_iradon] error(rms: %.3g)" % (error_np_fbp**2).mean().sqrt())
+		axarr[1, 2].imshow((error_np_fbp).numpy(), cmap=plt.cm.Greys_r)
 
-		fig.tight_layout()
+		plt.tight_layout()
 		plt.show()
 
 	def test_radon_bias_phantom(self):
@@ -85,29 +85,29 @@ class TestRADONBIAS(unittest.TestCase):
 			% ((error_np_fbp**2).mean().sqrt(), error_np_fbp.abs().mean()))
 
 
-		fig, axarr = plt.subplots(3, 2, figsize=(8, 13.5))
+		fig, axarr = plt.subplots(2, 3, figsize=(15, 8))
 		axarr[0, 0].set_title("Original")
 		axarr[0, 0].imshow(image.numpy(), cmap=plt.cm.Greys_r)
 
-		axarr[0, 1].set_title("Radon transform\n(Sinogram)")
-		axarr[0, 1].set_xlabel("Projection angle (deg)")
-		axarr[0, 1].set_ylabel("Projection position (pixels)")
-		axarr[0, 1].imshow(sinogram.numpy(), cmap=plt.cm.Greys_r, 
+		axarr[1, 0].set_title("Radon transform\n(Sinogram)")
+		axarr[1, 0].set_xlabel("Projection angle (deg)")
+		axarr[1, 0].set_ylabel("Projection position (pixels)")
+		axarr[1, 0].imshow(sinogram.numpy(), cmap=plt.cm.Greys_r, 
 			extent=(0, 180, 0, sinogram.size(0)), aspect='auto')
 
-		axarr[1, 0].set_title("fbp iradon")
-		axarr[1, 0].imshow(fbp.numpy(), cmap=plt.cm.Greys_r)
+		axarr[0, 1].set_title("fbp iradon")
+		axarr[0, 1].imshow(fbp.numpy(), cmap=plt.cm.Greys_r)
 
-		axarr[1, 1].set_title("fbp iradon error")
+		axarr[1, 1].set_title("fbp[iradon] error (rms: %.3g)" % (error_fbp**2).mean().sqrt())
 		axarr[1, 1].imshow((error_fbp).numpy(), cmap=plt.cm.Greys_r)		
 
-		axarr[2, 0].set_title("fbp np_iradon")
-		axarr[2, 0].imshow(np_fbp.numpy(), cmap=plt.cm.Greys_r)
+		axarr[0, 2].set_title("fbp np_iradon")
+		axarr[0, 2].imshow(np_fbp.numpy(), cmap=plt.cm.Greys_r)
 
-		axarr[2, 1].set_title("fbp np_iradon error")
-		axarr[2, 1].imshow((error_np_fbp).numpy(), cmap=plt.cm.Greys_r)
+		axarr[1, 2].set_title("fbp[np_iradon] error(rms: %.3g)" % (error_np_fbp**2).mean().sqrt())
+		axarr[1, 2].imshow((error_np_fbp).numpy(), cmap=plt.cm.Greys_r)
 
-		fig.tight_layout()
+		plt.tight_layout()
 		plt.show()				
 
 if __name__ == "__main__":
