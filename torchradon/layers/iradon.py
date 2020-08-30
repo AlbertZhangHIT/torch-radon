@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 from scipy.interpolate import interp1d
-from radon_transform import _C
+from torchradon import _C
 
 def designFilter(filter_mode, length, d=1.):
 	if filter_mode not in ('ram-lak', 'shepp-logan', 'cosine', 'hamming', 'hann'):
@@ -49,7 +49,9 @@ def filterProjections(radon_img, filter_mode, d=1.):
 
 def iradon(radon_img, theta=None, output_size=None, filt='ram-lak', interp_mode='linear', d=1.):
 	# iradon.__doc__ = """
-	# This function performs Filtered Backprojection of 2-D tensor of radon measures"""
+	# This function performs Filtered Backprojection of 2-D tensor of radon measures
+	# using the torch implementation
+	# """
 	radon_img = radon_img.cpu().squeeze()
 
 	if radon_img.dim() != 2:
@@ -79,7 +81,9 @@ def iradon(radon_img, theta=None, output_size=None, filt='ram-lak', interp_mode=
 
 def np_iradon(radon_img, theta=None, output_size=None, filt='ram-lak', interp_mode='linear', d=1.):
 	# iradon.__doc__ = """
-	# This function performs Filtered Backprojection of 2-D tensor of radon measures"""
+	# This function performs Filtered Backprojection of 2-D tensor of radon measures
+	# using the numpy pipeline implementation
+	# """
 	radon_img = radon_img.cpu().squeeze()
 
 	if radon_img.dim() != 2:

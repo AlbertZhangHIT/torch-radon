@@ -1,0 +1,18 @@
+__pycache__/
+*.py[cod]
+*.tar
+*.txt
+*.*.pyc
+
+# Distribution / packaging
+.Python
+build/
+dist/
+develop-eggs/
+eggs/
+.eggs/
+*.egg-info/
+torchradon/__pycache__/
+torchradon/layers/__pycache__/
+torchradon/*.py[cod]
+tests/__pycache__/

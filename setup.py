@@ -13,11 +13,11 @@ requirements = ["torch", "torchvision"]
 
 def get_extensions():
 	this_dir = os.path.dirname(os.path.abspath(__file__))
-	extensions_dir = os.path.join(this_dir, "radon_transform", "csrc")
-	mail_file = glob.glob(os.path.join(extensions_dir, "*.cpp"))
+	extensions_dir = os.path.join(this_dir, "torchradon", "csrc")
+	main_file = glob.glob(os.path.join(extensions_dir, "*.cpp"))
 	source_cpu = glob.glob(os.path.join(extensions_dir, "cpu", "*.cpp"))
 
-	sources = mail_file + source_cpu
+	sources = main_file + source_cpu
 	extension = CppExtension
 
 	extra_compile_args = {"cxx": []}
@@ -28,7 +28,7 @@ def get_extensions():
 
 	ext_modules = [
 		extension(
-			"radon_transform._C",
+			"torchradon._C",
 			sources,
 			include_dirs=include_dirs,
 			define_macros=define_macros,
@@ -38,10 +38,10 @@ def get_extensions():
 	return ext_modules
 
 setup(
-	name="radon_transform",
-	version="0.1",
+	name="torchradon",
+	version="0.2",
 	author="hao zhang",
-	url="https://github.com/AlbertZhangHIT/pytorch_radon",
+	url="https://github.com/AlbertZhangHIT/torch-radon",
 	description="radon transform in pytorch",
 	packages=find_packages(exclude=("tests",)),
 	ext_modules=get_extensions(),

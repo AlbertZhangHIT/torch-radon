@@ -2,12 +2,12 @@ import unittest
 
 import torch
 import numpy as np
-from radon_transform.layers import radon, iradon, np_iradon
+from torchradon import radon, iradon, np_iradon
 
 import matplotlib.pyplot as plt
 
 class TestRADONBIAS(unittest.TestCase):
-	def test_iradon_bias_circular_phantom(self):
+	def test_radon_bias_circular_phantom(self):
 		"""
 		test that a uniform circular phantom has a small reconstruction bias
 		"""
@@ -26,13 +26,13 @@ class TestRADONBIAS(unittest.TestCase):
 
 		fbp = iradon(sinogram, theta=theta, output_size=image.size(0))
 		error_fbp = image - fbp
-		print("iradon FBP rms error: %.3g, roi error: %.3g" 
-			% ((error_fbp**2).mean().sqrt(), error_fbp.mean().abs()))
+		print("iradon FBP rms error: %.3g, mae error: %.3g" 
+			% ((error_fbp**2).mean().sqrt(), error_fbp.abs().mean()))
 
 		np_fbp = np_iradon(sinogram, theta=theta, output_size=image.size(0))
 		error_np_fbp = image - np_fbp
-		print("np_iradon FBP rms error: %.3g, roi error: %.3g" 
-			% ((error_np_fbp**2).mean().sqrt(), error_np_fbp.mean().abs()))
+		print("np_iradon FBP rms error: %.3g, mae error: %.3g" 
+			% ((error_np_fbp**2).mean().sqrt(), error_np_fbp.abs().mean()))
 
 
 		fig, axarr = plt.subplots(3, 2, figsize=(8, 13.5))
@@ -60,11 +60,14 @@ class TestRADONBIAS(unittest.TestCase):
 		fig.tight_layout()
 		plt.show()
 
-	def test_radon_phantom(self):
+	def test_radon_bias_phantom(self):
+		"""
+		test that the phantom image has a small reconstruction bias
+		"""		
 		from skimage.io import imread
 		from skimage.transform import rescale
-		image = imread('./phantom.png', as_gray=True)
-		image = rescale(image, scale=0.4, mode='reflect', multichannel=False)
+		image = imread('./phantom.png', as_gray=True) # the pixel value range is [0, 1]
+		#image = rescale(image, scale=0.4, mode='reflect', multichannel=False)
 		theta = np.linspace(0., 180., max(image.shape), endpoint=False)
 
 		image = torch.from_numpy(image).float()
@@ -73,13 +76,13 @@ class TestRADONBIAS(unittest.TestCase):
 
 		fbp = iradon(sinogram, theta=theta, output_size=image.size(0))
 		error_fbp = image - fbp
-		print("iradon FBP rms error: %.3g, roi error: %.3g" 
-			% ((error_fbp**2).mean().sqrt(), error_fbp.mean().abs()))
+		print("iradon FBP rms error: %.3g, mae error: %.3g" 
+			% ((error_fbp**2).mean().sqrt(), error_fbp.abs().mean()))
 
 		np_fbp = np_iradon(sinogram, theta=theta, output_size=image.size(0))
 		error_np_fbp = image - np_fbp
-		print("np_iradon FBP rms error: %.3g, roi error: %.3g" 
-			% ((error_np_fbp**2).mean().sqrt(), error_np_fbp.mean().abs()))
+		print("np_iradon FBP rms error: %.3g, mae error: %.3g" 
+			% ((error_np_fbp**2).mean().sqrt(), error_np_fbp.abs().mean()))
 
 
 		fig, axarr = plt.subplots(3, 2, figsize=(8, 13.5))
