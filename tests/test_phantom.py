@@ -58,6 +58,7 @@ class TestRADONBIAS(unittest.TestCase):
 		axarr[1, 2].imshow((error_np_fbp).numpy(), cmap=plt.cm.Greys_r)
 
 		plt.tight_layout()
+		plt.savefig("./test_circular.png", format='png', bbox_inches='tight')
 		plt.show()
 
 	def test_radon_bias_phantom(self):
@@ -108,6 +109,7 @@ class TestRADONBIAS(unittest.TestCase):
 		axarr[1, 2].imshow((error_np_fbp).numpy(), cmap=plt.cm.Greys_r)
 
 		plt.tight_layout()
+		plt.savefig("./test_phantom.png", format='png', bbox_inches='tight')
 		plt.show()				
 
 if __name__ == "__main__":
