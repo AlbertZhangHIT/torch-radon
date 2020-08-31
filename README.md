@@ -19,9 +19,9 @@ The requirements for the conda environment in which I have tested this code are 
 # Usage
 some examples are provided in [tests](https://github.com/AlbertZhangHIT/torch-radon/tree/master/tests). The results are presented in following figures.
 
-![](https://github.com/AlbertZhangHIT/torch-radon/tree/master/tests/test_circular.png)
+![](/tests/test_circular.png)
 
-![](https://github.com/AlbertZhangHIT/torch-radon/tree/master/tests/test_phantom.png)
+![](/tests/test_phantom.png)
 
 
 
