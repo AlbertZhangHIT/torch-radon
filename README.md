@@ -26,4 +26,4 @@ some examples are provided in [tests](https://github.com/AlbertZhangHIT/torch-ra
 
 
 # License
-MIT License see (https://github.com/AlbertZhangHIT/torch-radon/tree/master/LICENSE)
+MIT License see [LICENSE](https://github.com/AlbertZhangHIT/torch-radon/tree/master/LICENSE).
