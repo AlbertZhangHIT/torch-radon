@@ -17,13 +17,16 @@ The requirements for the conda environment in which I have tested this code are 
     python setup.py install
 
 # Usage
-some examples are provided in [tests](https://github.com/AlbertZhangHIT/torch-radon/tree/master/tests). The results are presented in following figures.
+some examples are provided in [tests](https://github.com/AlbertZhangHIT/torch-radon/tree/master/tests). The results from [phantom image](https://github.com/AlbertZhangHIT/torch-radon/tree/master/tests/test_phantom.py) are presented in following figures.
 
 ![](/tests/test_circular.png)
 
 ![](/tests/test_phantom.png)
 
+The comparison with the signogram and reconstruction from MATLAB on phantom image is provided by [test_comparison.py](https://github.com/AlbertZhangHIT/torch-radon/tree/master/tests/test_comparison.py):
 
+    sinogram rms error: 0.42, mae error: 0.0169
+    FBP rms error: 0.00805, mae error: 0.00601
 
 # License
 MIT License see [LICENSE](https://github.com/AlbertZhangHIT/torch-radon/tree/master/LICENSE).
